@@ -1,0 +1,18 @@
+# Central configuration for the project.
+# Filled in as each module is implemented — no hardcoded paths/parameters
+# should exist inside src/.
+
+paths:
+  raw_data_dir: data/raw
+  processed_data_dir: data/processed
+  graph_dir: data/graph
+  trained_models_dir: artifacts/trained_models
+  results_dir: results
+
+model:
+  # GNN architecture and training hyperparameters go here once Module D
+  # (src/models) is implemented.
+
+recommendation:
+  # Safety thresholds used by Module G (src/recommendation) to filter/penalize
+  # candidate drugs based on interaction risk go here.

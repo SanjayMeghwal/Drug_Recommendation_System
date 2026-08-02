@@ -1,0 +1,27 @@
+# Deep learning / GNN
+torch
+torch-geometric
+
+# Graph utilities
+networkx
+
+# Data processing
+pandas
+numpy
+
+# Explainability
+shap
+
+# Backend API
+fastapi
+uvicorn
+
+# Frontend / demo interface
+streamlit
+
+# Testing
+pytest
+
+# Code quality
+black
+ruff
