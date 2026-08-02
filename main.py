@@ -1,4 +1,26 @@
-"""Application entry point. Wires together the API (src/api) and the
-demo interface (src/interface). Left empty until Module H and Module I
-are implemented per the milestone plan.
+"""Application entry point.
+
+Run this directly for a quick smoke test of the wired (currently stubbed)
+pipeline:
+    python main.py
+
+For the real API server:      python -m uvicorn src.api.main:app --reload
+For the real demo interface:  python -m streamlit run src/interface/app.py
 """
+
+from src.api.main import orchestrate_recommendation
+
+
+def main() -> None:
+    result = orchestrate_recommendation(
+        condition="hypertension",
+        current_medications=["Aspirin"],
+    )
+    print("Recommended:")
+    for item in result["recommended"]:
+        print(f"  - {item['drug']} (score={item['score']:.2f}): {item['explanation']}")
+    print("Warnings:", result["warnings"] or "none")
+
+
+if __name__ == "__main__":
+    main()

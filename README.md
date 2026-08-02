@@ -6,7 +6,8 @@ provides personalized, explainable drug recommendations using XAI techniques (SH
 ## Project Status
 
 Design phase complete (architecture, technology stack, API design, folder structure).
-Implementation has not started — see `docs/` for the finalized design.
+Environment verified and pinned. Implementation is starting — see `docs/` for the
+finalized design.
 
 ## Reference Paper (Baseline)
 
@@ -32,9 +33,27 @@ See the README in each folder for details on what belongs there.
 
 ## Setup
 
+Requires Python 3.10.
+
 ```
 python -m venv .venv
+
+# Windows
+.venv\Scripts\activate
+# macOS/Linux
+source .venv/bin/activate
+
+# Install PyTorch (CPU-only build first, for a portable install regardless of GPU)
+pip install torch==2.13.0 --index-url https://download.pytorch.org/whl/cpu
+
+# Install everything else
 pip install -r requirements.txt
+```
+
+Verify the install:
+
+```
+python -c "import torch, torch_geometric, networkx, pandas, numpy, shap, fastapi, uvicorn, streamlit, pytest; print('All imports OK')"
 ```
 
 ## Tech Stack

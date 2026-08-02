@@ -1,27 +1,35 @@
+# NOTE ON INSTALLING TORCH:
+# Install torch from the CPU-only wheel index FIRST, so anyone cloning this
+# repo (regardless of GPU availability) gets the same lean, portable build:
+#   pip install torch==2.13.0 --index-url https://download.pytorch.org/whl/cpu
+# Then install everything below with a normal:
+#   pip install -r requirements.txt
+
 # Deep learning / GNN
-torch
-torch-geometric
+torch==2.13.0
+torch-geometric==2.8.0.post1
 
 # Graph utilities
-networkx
+networkx==3.4.2
 
 # Data processing
-pandas
-numpy
+pandas==2.3.3
+numpy==2.2.6
 
 # Explainability
-shap
+shap==0.49.1
 
 # Backend API
-fastapi
-uvicorn
+fastapi==0.141.1
+uvicorn==0.52.1
 
 # Frontend / demo interface
-streamlit
+streamlit==1.60.0
 
 # Testing
-pytest
+pytest==9.1.1
+httpx==0.28.1  # required by FastAPI's TestClient
 
 # Code quality
-black
-ruff
+black==26.5.1
+ruff==0.16.1
