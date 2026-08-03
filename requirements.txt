@@ -1,7 +1,15 @@
 # NOTE ON INSTALLING TORCH:
 # Install torch from the CPU-only wheel index FIRST, so anyone cloning this
 # repo (regardless of GPU availability) gets the same lean, portable build:
-#   pip install torch==2.13.0 --index-url https://download.pytorch.org/whl/cpu
+#
+#   pip install torch==2.13.0 \
+#       --index-url https://download.pytorch.org/whl/cpu \
+#       --extra-index-url https://pypi.org/simple
+#
+# Both indexes are required. --index-url on its own REPLACES PyPI, and the
+# PyTorch index does not host torch's dependencies, so the install fails on
+# typing-extensions. (Verified against a clean clone with no pip cache.)
+#
 # Then install everything below with a normal:
 #   pip install -r requirements.txt
 

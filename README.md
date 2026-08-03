@@ -33,7 +33,9 @@ See the README in each folder for details on what belongs there.
 
 ## Setup
 
-Requires Python 3.10.
+Requires Python 3.10. On Windows, clone to a short path such as
+`C:\projects\` — RDKit fails to load from deeply nested directories because
+of the 260-character path limit.
 
 ```
 python -m venv .venv
@@ -43,8 +45,11 @@ python -m venv .venv
 # macOS/Linux
 source .venv/bin/activate
 
-# Install PyTorch (CPU-only build first, for a portable install regardless of GPU)
-pip install torch==2.13.0 --index-url https://download.pytorch.org/whl/cpu
+# Install PyTorch first, from the CPU-only wheel index, so the install stays
+# portable regardless of whether the machine has a GPU. Both indexes are
+# needed: --index-url alone replaces PyPI, and PyTorch's index does not host
+# torch's own dependencies.
+pip install torch==2.13.0 --index-url https://download.pytorch.org/whl/cpu --extra-index-url https://pypi.org/simple
 
 # Install everything else
 pip install -r requirements.txt
@@ -79,7 +84,19 @@ python -m uvicorn src.api.main:app --reload        # API on http://127.0.0.1:800
 python -m streamlit run src/interface/app.py       # UI on http://localhost:8501
 ```
 
-See `docs/data_acquisition.md` for the dataset source, license, and citation.
+The trained checkpoint is committed, so steps 1–3 followed by `pytest` and the
+app work without retraining. `python -m src.models.train` takes about six
+minutes on CPU if you want to reproduce training itself.
+
+## Documentation
+
+| Document | Contents |
+|---|---|
+| `docs/data_acquisition.md` | Dataset source, licence, and required citation |
+| `docs/model_selection.md` | How the architecture was chosen, and why our figures differ from the paper's |
+| `docs/explainability.md` | Why SHAP was rejected for this model, with evidence, and what replaced it |
+| `docs/recommendation.md` | The recommendation layer's design and its limitations |
+| `docs/reproducibility.md` | Clean-clone verification, and the install bug it caught |
 
 ## Tech Stack
 
