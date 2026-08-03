@@ -19,14 +19,17 @@ model:
   attention_heads: 4 # only used when conv_type is "gat"
 
   # Decoder scoring a drug pair from its two embeddings.
-  # "dot" is parameter-free; "mlp" is the more expressive fallback.
-  decoder: dot
+  # "mlp" chosen over the simpler parameter-free "dot" on validation AUC
+  # (0.9249 vs 0.9081 at 200 epochs). See docs/model_selection.md.
+  decoder: mlp
 
 training:
-  epochs: 200
+  # 800 epochs because the MLP decoder was still improving at the previous
+  # 200-epoch cap; validation AUC plateaus around epoch 650-800.
+  epochs: 800
   learning_rate: 0.01
   weight_decay: 0.0005
-  patience: 20 # early stopping: epochs without validation AUC improvement
+  patience: 50 # early stopping: epochs without validation AUC improvement
   seed: 42
 
 recommendation:

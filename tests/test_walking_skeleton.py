@@ -34,13 +34,22 @@ def test_recommend_endpoint_returns_expected_shape():
 
 
 def test_ddi_check_endpoint_returns_expected_shape():
-    response = client.post("/ddi/check", json={"drug_a": "Aspirin", "drug_b": "Warfarin"})
+    response = client.post("/ddi/check", json={"drug_a": "Warfarin", "drug_b": "Ibuprofen"})
     assert response.status_code == 200
 
     body = response.json()
-    assert body["drug_a"] == "Aspirin"
-    assert body["drug_b"] == "Warfarin"
-    assert isinstance(body["interaction_probability"], float)
+    assert body["drug_a"] == "Warfarin"
+    assert body["drug_b"] == "Ibuprofen"
+    assert 0.0 <= body["interaction_probability"] <= 1.0
+
+
+def test_ddi_check_endpoint_reports_unknown_drug():
+    """An unrecognised drug should return 404 rather than a 500, so the
+    caller can tell the difference between a bad input and a broken server.
+    """
+    response = client.post("/ddi/check", json={"drug_a": "NotARealDrug", "drug_b": "Warfarin"})
+    assert response.status_code == 404
+    assert "NotARealDrug" in response.json()["detail"]
 
 
 def test_orchestrate_recommendation_function_directly():

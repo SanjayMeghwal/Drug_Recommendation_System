@@ -15,5 +15,10 @@ data/graph/*
 !data/graph/README.md
 artifacts/trained_models/*
 !artifacts/trained_models/README.md
+# The trained checkpoint IS committed (17 KB) so a fresh clone can run the
+# app without first spending ~6 minutes retraining.
+!artifacts/trained_models/ddi_gnn.pt
 results/*
 !results/README.md
+# The evaluation report is committed as evidence of measured performance.
+!results/evaluation_report.json

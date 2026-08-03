@@ -1,0 +1,50 @@
+{
+  "dataset": {
+    "drugs": 1704,
+    "node_features": 12,
+    "message_passing_edges": 228406,
+    "test_positive_edges": 38116,
+    "test_negative_edges": 38116
+  },
+  "results": {
+    "threshold_selected_on": "validation",
+    "validation": {
+      "auc": 0.9492405211131337,
+      "aupr": 0.94753002177538,
+      "accuracy": 0.8720661590968758,
+      "precision": 0.8408369408369408,
+      "recall": 0.9178787083223944,
+      "f1": 0.877670390360236,
+      "threshold": 0.30999999999999994,
+      "num_examples": 76180
+    },
+    "test": {
+      "auc": 0.9500893799333869,
+      "aupr": 0.9484092067964836,
+      "accuracy": 0.8740686325952356,
+      "precision": 0.8433015506115766,
+      "recall": 0.9188792108300976,
+      "f1": 0.879469666532744,
+      "threshold": 0.30999999999999994,
+      "num_examples": 76232
+    }
+  },
+  "baseline_comparison": {
+    "accuracy": {
+      "ours": 0.8741,
+      "baseline_paper": 0.923,
+      "difference": -0.0489
+    },
+    "precision": {
+      "ours": 0.8433,
+      "baseline_paper": 0.891,
+      "difference": -0.0477
+    },
+    "recall": {
+      "ours": 0.9189,
+      "baseline_paper": 0.914,
+      "difference": 0.0049
+    }
+  },
+  "comparison_caveat": "The baseline paper reports on its own DrugBank 5.1.13 + FAERS pipeline, including drug-food interactions, so these figures are a reference point rather than a like-for-like reproduction. Our split also removes 231 drug pairs that appeared in more than one split under different interaction types; leaving them in would raise our scores but train on test data."
+}

@@ -2,11 +2,11 @@
 /recommend response, and exposes Module D directly via /ddi/check.
 """
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 
 from src.api.schemas import DDICheckRequest, RecommendationRequest
 from src.explainability.explain import explain
-from src.models.predict import predict
+from src.models.predict import UnknownDrugError, predict
 from src.recommendation.recommend import recommend
 
 app = FastAPI(title="Explainable DDI & Drug Recommendation API")
@@ -34,7 +34,13 @@ def recommend_endpoint(request: RecommendationRequest) -> dict:
 
 @app.post("/ddi/check")
 def ddi_check_endpoint(request: DDICheckRequest) -> dict:
-    probability = predict(request.drug_a, request.drug_b)
+    try:
+        probability = predict(request.drug_a, request.drug_b)
+    except UnknownDrugError as error:
+        # An unrecognised drug is a client mistake, not a server fault, and
+        # the caller needs to know which identifier failed.
+        raise HTTPException(status_code=404, detail=str(error)) from error
+
     return {
         "drug_a": request.drug_a,
         "drug_b": request.drug_b,
