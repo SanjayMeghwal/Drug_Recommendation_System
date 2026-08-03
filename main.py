@@ -14,12 +14,23 @@ from src.api.main import orchestrate_recommendation
 def main() -> None:
     result = orchestrate_recommendation(
         condition="hypertension",
-        current_medications=["Warfarin"],
+        current_medications=["Warfarin", "Ibuprofen"],
     )
-    print("Recommended:")
+
+    print(f"Condition: {result['condition']}")
+    print(f"Candidates considered: {result['candidates_considered']}\n")
+
+    print(f"Recommended ({len(result['recommended'])}):")
     for item in result["recommended"]:
-        print(f"  - {item['drug']} (score={item['score']:.2f}): {item['explanation']}")
-    print("Warnings:", result["warnings"] or "none")
+        print(f"  - {item['drug']} (score {item['score']:.2f}, {item['risk_level']} risk)")
+        print(f"      {item['explanation']}")
+
+    print(f"\nExcluded for interaction risk ({len(result['warnings'])}):")
+    for item in result["warnings"][:5]:
+        print(
+            f"  - {item['drug']} (risk {item['max_interaction_risk']:.2f} "
+            f"vs {item['riskiest_medication']})"
+        )
 
 
 if __name__ == "__main__":

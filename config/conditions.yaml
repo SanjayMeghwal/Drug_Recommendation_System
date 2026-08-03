@@ -1,0 +1,152 @@
+# Condition -> drug-target mapping.
+#
+# WHY THIS FILE EXISTS
+# The dataset records each drug's protein target but carries no clinical
+# indications, so there is no data-derived way to ask "which drugs treat
+# hypertension?". This file supplies that link. Candidate drugs are then read
+# from data/processed/drug_targets.csv — the drug lists themselves are never
+# hardcoded, only the condition-to-target link.
+#
+# WHY ACTION MATTERS
+# A target alone is not enough, because the same protein is treated in
+# opposite directions for different conditions. ADRB2 is the clearest case:
+# hypertension calls for beta-ANTAGONISTS (beta-blockers), while asthma calls
+# for beta-AGONISTS (bronchodilators). Matching on target alone would
+# recommend salbutamol-like drugs for high blood pressure, which would raise
+# it rather than lower it. Each target therefore records the action its
+# therapeutic drug class exerts, and a drug qualifies only if its recorded
+# action matches.
+#
+# Actions are matched WORD BY WORD against the `action` column, never as
+# substrings: "antagonist" contains "agonist", so substring matching would
+# treat every beta-blocker as a beta-agonist. Word matching still handles
+# "partial agonist" and multi-role records like "antagonist;inhibitor".
+# Drugs whose action is unknown are excluded, since their direction of effect
+# cannot be verified.
+#
+# SCOPE AND LIMITATIONS
+#   * Curated for demonstration, not a clinical knowledge base. Nine
+#     conditions, chosen because the dataset holds enough drugs for each.
+#   * The pharmacology is standard but deliberately coarse, and omits many
+#     valid drug classes.
+#   * A drug listed here acts on a target associated with the condition. That
+#     is not a claim it is an appropriate treatment for any patient.
+#   * This project is an academic prototype. Nothing here should inform real
+#     prescribing.
+#
+# `drug_count` records how many drugs in the processed data qualify, so the
+# demo scope is visible without querying.
+
+conditions:
+  hypertension:
+    description: High blood pressure
+    drug_count: 34
+    targets:
+      - gene: ACE # ACE inhibitors
+        actions: [inhibitor]
+      - gene: AGTR1 # angiotensin receptor blockers
+        actions: [antagonist]
+      - gene: ADRB1 # cardioselective beta-blockers
+        actions: [antagonist]
+      - gene: ADRB2 # non-selective beta-blockers
+        actions: [antagonist]
+      - gene: CACNA1C # calcium channel blockers
+        actions: [blocker, antagonist, inhibitor]
+      - gene: NR3C2 # aldosterone antagonists
+        actions: [antagonist]
+
+  pain and inflammation:
+    description: Analgesic and anti-inflammatory indications
+    drug_count: 37
+    targets:
+      - gene: PTGS1 # non-selective NSAIDs
+        actions: [inhibitor]
+      - gene: PTGS2 # COX-2 selective inhibitors
+        actions: [inhibitor, antagonist]
+      - gene: OPRM1 # opioid analgesics act as agonists
+        actions: [agonist]
+      - gene: TRPV1 # capsaicin-type topical analgesics
+        actions: [agonist]
+
+  depression:
+    description: Major depressive disorder
+    drug_count: 22
+    targets:
+      - gene: SLC6A4 # SSRIs
+        actions: [inhibitor]
+      - gene: SLC6A2 # SNRIs
+        actions: [inhibitor]
+      - gene: SLC6A3 # dopamine reuptake inhibitors
+        actions: [inhibitor]
+      - gene: HTR2A # atypical antidepressants
+        actions: [antagonist]
+
+  asthma and COPD:
+    description: Obstructive airway disease
+    drug_count: 16
+    targets:
+      - gene: ADRB2 # bronchodilators act as agonists here
+        actions: [agonist]
+      - gene: CHRM3 # inhaled anticholinergics
+        actions: [antagonist]
+      - gene: PDE4D # PDE4 inhibitors
+        actions: [inhibitor]
+
+  cancer:
+    description: Oncology, broadly scoped
+    drug_count: 20
+    targets:
+      - gene: EGFR
+        actions: [inhibitor, antagonist]
+      - gene: VEGFA
+        actions: [inhibitor, binder]
+      - gene: TOP2A
+        actions: [inhibitor]
+      - gene: TUBB
+        actions: [inhibitor, binder]
+
+  type 2 diabetes:
+    description: Non-insulin-dependent diabetes mellitus
+    drug_count: 12
+    targets:
+      - gene: DPP4 # gliptins
+        actions: [inhibitor]
+      - gene: PPARG # thiazolidinediones
+        actions: [agonist]
+      - gene: SLC5A2 # SGLT2 inhibitors
+        actions: [inhibitor]
+      - gene: ABCC8 # sulfonylureas
+        actions: [blocker, inhibitor]
+
+  epilepsy:
+    description: Seizure disorders
+    drug_count: 7
+    targets:
+      - gene: SCN1A # sodium channel blockers
+        actions: [blocker, inhibitor]
+      - gene: GABRA1 # GABA-A potentiators
+        actions: [agonist, positive]
+      - gene: CACNA1G # T-type calcium channel blockers
+        actions: [blocker, inhibitor]
+      - gene: SV2A # levetiracetam-type
+        actions: [binder, ligand]
+
+  anticoagulation:
+    description: Prevention of pathological clotting
+    drug_count: 10
+    targets:
+      - gene: F2 # direct thrombin inhibitors
+        actions: [inhibitor]
+      - gene: VKORC1 # vitamin K antagonists
+        actions: [inhibitor]
+      - gene: F10 # factor Xa inhibitors
+        actions: [inhibitor]
+
+  anxiety and insomnia:
+    description: Anxiolytic and sedative indications
+    drug_count: 4
+    targets:
+      - gene: GABRA1 # benzodiazepines and Z-drugs
+        actions: [agonist, positive]
+      - gene: HTR1A # buspirone-type anxiolytics
+        actions: [agonist]

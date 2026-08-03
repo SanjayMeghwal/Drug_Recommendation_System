@@ -33,5 +33,11 @@ training:
   seed: 42
 
 recommendation:
-  # Safety thresholds used by Module G (src/recommendation) to filter or
-  # penalize candidate drugs. Populated on Day 8.
+  # A candidate whose worst predicted interaction reaches this level is
+  # excluded from recommendations and reported as a warning instead.
+  high_risk_threshold: 0.8
+  # Between this and high_risk_threshold a candidate is still recommended,
+  # but flagged as requiring caution.
+  moderate_risk_threshold: 0.5
+  # Maximum drugs returned in a single recommendation list.
+  max_recommendations: 10

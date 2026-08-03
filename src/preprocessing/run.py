@@ -60,6 +60,31 @@ def build_ddi_pairs_table(
     return combined.reset_index(drop=True)
 
 
+def build_drug_targets_table(targets_df: pd.DataFrame, known_drug_ids: set) -> pd.DataFrame:
+    """Extract each drug's protein target.
+
+    Module G uses these targets to decide which drugs are candidates for a
+    condition, since the source data carries no clinical indications. The raw
+    file repeats a drug across rows but records exactly one target gene per
+    drug, so duplicates are collapsed.
+    """
+    targets = targets_df.rename(
+        columns={
+            "DrugBank ID": "drug_id",
+            "target_gene_name": "target_gene",
+            "target_name": "target_name",
+            "action": "action",
+        }
+    )
+
+    targets = targets.dropna(subset=["drug_id", "target_gene"])
+    targets = targets[targets["drug_id"].isin(known_drug_ids)]
+    targets = targets.drop_duplicates(subset=["drug_id", "target_gene"])
+    targets["action"] = targets["action"].fillna("unknown")
+
+    return targets[["drug_id", "target_gene", "target_name", "action"]].reset_index(drop=True)
+
+
 def run() -> None:
     PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -67,6 +92,10 @@ def run() -> None:
     smiles_df = pd.read_csv(RAW_DIR / "drug_smiles.csv")
     attributes_df = pd.read_csv(
         RAW_DIR / "file_drugs.csv", usecols=["DrugBank ID", "Name", "Drug Groups"]
+    )
+    targets_df = pd.read_csv(
+        RAW_DIR / "file_drugs.csv",
+        usecols=["DrugBank ID", "target_gene_name", "target_name", "action"],
     )
     train_df = pd.read_csv(RAW_DIR / "ddi_training.csv", usecols=["d1", "d2", "type", "split"])
     val_df = pd.read_csv(RAW_DIR / "ddi_validation.csv", usecols=["d1", "d2", "type", "split"])
@@ -84,8 +113,17 @@ def run() -> None:
     print(f"  {len(ddi_pairs)} pairs")
     print(f"  split counts:\n{ddi_pairs['split'].value_counts().to_string()}")
 
+    print("Building drug_targets table...")
+    drug_targets = build_drug_targets_table(targets_df, known_drug_ids=set(drugs["drug_id"]))
+    print(
+        f"  {len(drug_targets)} drug-target rows "
+        f"covering {drug_targets['drug_id'].nunique()} drugs "
+        f"and {drug_targets['target_gene'].nunique()} targets"
+    )
+
     drugs.to_csv(PROCESSED_DIR / "drugs.csv", index=False)
     ddi_pairs.to_csv(PROCESSED_DIR / "ddi_pairs.csv", index=False)
+    drug_targets.to_csv(PROCESSED_DIR / "drug_targets.csv", index=False)
     print(f"Saved to {PROCESSED_DIR}")
 
 

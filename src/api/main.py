@@ -7,42 +7,52 @@ from fastapi import FastAPI, HTTPException
 from src.api.schemas import DDICheckRequest, RecommendationRequest
 from src.explainability.explain import explain_interaction
 from src.models.predict import UnknownDrugError, predict
-from src.recommendation.recommend import recommend
+from src.recommendation.recommend import (
+    UnknownConditionError,
+    get_recommendation_service,
+    recommend_drugs,
+)
 
 app = FastAPI(title="Explainable DDI & Drug Recommendation API")
 
 
-def _explain_candidate(candidate_drug: str, current_medications: list[str]) -> str:
-    """Explain a candidate against the patient's existing medications.
+def _explain_candidate(candidate_drug: str, riskiest_medication: str | None) -> str:
+    """Explain a candidate against the medication that drove its score.
 
-    An explanation only means something relative to what the patient is
-    already taking, so with no current medications there is no interaction
-    to justify.
+    Only the worst interaction is explained, because that is the one the
+    score is based on — explaining every medication would bury it.
     """
-    if not current_medications:
+    if riskiest_medication is None:
         return (
             "No current medications were provided, so no drug-drug "
             "interaction could be assessed for this recommendation."
         )
 
-    summaries = []
-    for medication in current_medications:
-        try:
-            summaries.append(explain_interaction(candidate_drug, medication).summary)
-        except UnknownDrugError as error:
-            summaries.append(str(error))
-
-    return " ".join(summaries)
+    try:
+        return explain_interaction(candidate_drug, riskiest_medication).summary
+    except UnknownDrugError as error:
+        return str(error)
 
 
 def orchestrate_recommendation(condition: str, current_medications: list) -> dict:
     """Core orchestration logic, shared by the API route and the Streamlit interface."""
-    candidates = recommend(condition, current_medications)
-    recommended = [
-        {**candidate, "explanation": _explain_candidate(candidate["drug"], current_medications)}
-        for candidate in candidates
-    ]
-    return {"recommended": recommended, "warnings": []}
+    result = recommend_drugs(condition, current_medications)
+
+    def with_explanation(candidate) -> dict:
+        return {
+            **candidate.to_dict(),
+            "explanation": _explain_candidate(candidate.drug, candidate.riskiest_medication),
+        }
+
+    return {
+        "condition": result.condition,
+        "recommended": [with_explanation(candidate) for candidate in result.recommended],
+        # Drugs ruled out for interaction risk. Reported rather than silently
+        # dropped: knowing what was excluded, and why, is part of the answer.
+        "warnings": [with_explanation(candidate) for candidate in result.excluded],
+        "candidates_considered": result.candidates_considered,
+        "unrecognised_medications": result.unrecognised_medications,
+    }
 
 
 @app.get("/health")
@@ -50,9 +60,18 @@ def health() -> dict:
     return {"status": "ready"}
 
 
+@app.get("/conditions")
+def conditions_endpoint() -> dict:
+    """List the conditions the system can recommend for."""
+    return {"conditions": get_recommendation_service().available_conditions()}
+
+
 @app.post("/recommend")
 def recommend_endpoint(request: RecommendationRequest) -> dict:
-    return orchestrate_recommendation(request.condition, request.current_medications)
+    try:
+        return orchestrate_recommendation(request.condition, request.current_medications)
+    except UnknownConditionError as error:
+        raise HTTPException(status_code=404, detail=str(error)) from error
 
 
 @app.post("/ddi/check")

@@ -19,18 +19,37 @@ def test_health_endpoint():
 def test_recommend_endpoint_returns_expected_shape():
     response = client.post(
         "/recommend",
-        json={"condition": "hypertension", "current_medications": ["Aspirin"]},
+        json={"condition": "hypertension", "current_medications": ["Warfarin"]},
     )
     assert response.status_code == 200
 
     body = response.json()
+    assert body["condition"] == "hypertension"
     assert "recommended" in body
     assert "warnings" in body
     assert len(body["recommended"]) > 0
     for item in body["recommended"]:
         assert "drug" in item
         assert "score" in item
+        assert "risk_level" in item
         assert "explanation" in item
+
+
+def test_recommend_endpoint_reports_unknown_condition():
+    response = client.post(
+        "/recommend", json={"condition": "dragon pox", "current_medications": []}
+    )
+    assert response.status_code == 404
+    assert "dragon pox" in response.json()["detail"]
+
+
+def test_conditions_endpoint_lists_supported_conditions():
+    response = client.get("/conditions")
+    assert response.status_code == 200
+
+    conditions = response.json()["conditions"]
+    assert conditions
+    assert "hypertension" in {entry["condition"] for entry in conditions}
 
 
 def test_ddi_check_endpoint_returns_expected_shape():
@@ -53,6 +72,7 @@ def test_ddi_check_endpoint_reports_unknown_drug():
 
 
 def test_orchestrate_recommendation_function_directly():
-    result = orchestrate_recommendation("diabetes", [])
+    result = orchestrate_recommendation("type 2 diabetes", [])
     assert isinstance(result["recommended"], list)
     assert isinstance(result["warnings"], list)
+    assert result["condition"] == "type 2 diabetes"
