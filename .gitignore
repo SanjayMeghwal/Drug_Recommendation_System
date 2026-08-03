@@ -20,5 +20,6 @@ artifacts/trained_models/*
 !artifacts/trained_models/ddi_gnn.pt
 results/*
 !results/README.md
-# The evaluation report is committed as evidence of measured performance.
+# These reports are committed as evidence of measured performance.
 !results/evaluation_report.json
+!results/feature_importance.json

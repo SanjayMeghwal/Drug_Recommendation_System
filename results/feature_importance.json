@@ -1,0 +1,67 @@
+{
+  "baseline_auc": 0.9501,
+  "auc_with_all_features_removed": 0.8527,
+  "total_feature_contribution": 0.0974,
+  "per_feature": [
+    {
+      "feature": "LogP",
+      "auc_without": 0.9241,
+      "auc_drop": 0.02597
+    },
+    {
+      "feature": "NumAromaticRings",
+      "auc_without": 0.9311,
+      "auc_drop": 0.01895
+    },
+    {
+      "feature": "TPSA",
+      "auc_without": 0.9335,
+      "auc_drop": 0.01661
+    },
+    {
+      "feature": "FractionCSP3",
+      "auc_without": 0.9432,
+      "auc_drop": 0.0069
+    },
+    {
+      "feature": "HeavyAtomCount",
+      "auc_without": 0.9436,
+      "auc_drop": 0.00652
+    },
+    {
+      "feature": "RingCount",
+      "auc_without": 0.9439,
+      "auc_drop": 0.00619
+    },
+    {
+      "feature": "NumHAcceptors",
+      "auc_without": 0.9447,
+      "auc_drop": 0.00542
+    },
+    {
+      "feature": "NumHDonors",
+      "auc_without": 0.9449,
+      "auc_drop": 0.00521
+    },
+    {
+      "feature": "NumHeteroatoms",
+      "auc_without": 0.9476,
+      "auc_drop": 0.00247
+    },
+    {
+      "feature": "MolecularWeight",
+      "auc_without": 0.9477,
+      "auc_drop": 0.00237
+    },
+    {
+      "feature": "NumRotatableBonds",
+      "auc_without": 0.9479,
+      "auc_drop": 0.00222
+    },
+    {
+      "feature": "MolarRefractivity",
+      "auc_without": 0.9485,
+      "auc_drop": 0.00163
+    }
+  ]
+}
