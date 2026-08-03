@@ -104,6 +104,7 @@ def orchestrate_recommendation(condition: str, current_medications: list) -> dic
         # dropped: knowing what was excluded, and why, is part of the answer.
         "warnings": [with_explanation(candidate) for candidate in result.excluded],
         "candidates_considered": result.candidates_considered,
+        "safe_candidates_found": result.safe_candidates_found,
         "unrecognised_medications": result.unrecognised_medications,
     }
 

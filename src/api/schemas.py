@@ -84,6 +84,12 @@ class RecommendationResponse(BaseModel):
         description="Candidates excluded for high interaction risk"
     )
     candidates_considered: int
+    safe_candidates_found: int = Field(
+        description=(
+            "Acceptable candidates found. Can exceed len(recommended), which is "
+            "capped, so the counts still add up against candidates_considered."
+        )
+    )
     unrecognised_medications: list[str] = Field(
         description="Medications that could not be resolved, so were not checked"
     )

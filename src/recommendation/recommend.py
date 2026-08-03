@@ -67,6 +67,11 @@ class RecommendationResult:
     recommended: list[CandidateDrug] = field(default_factory=list)
     excluded: list[CandidateDrug] = field(default_factory=list)
     candidates_considered: int = 0
+    # `recommended` is capped at max_recommendations, so it can be shorter
+    # than the number of acceptable candidates. Without this count the
+    # figures do not add up and a reader cannot tell that safe options were
+    # trimmed rather than ruled out.
+    safe_candidates_found: int = 0
     unrecognised_medications: list[str] = field(default_factory=list)
 
     def to_dict(self) -> dict:
@@ -75,6 +80,7 @@ class RecommendationResult:
             "recommended": [drug.to_dict() for drug in self.recommended],
             "excluded": [drug.to_dict() for drug in self.excluded],
             "candidates_considered": self.candidates_considered,
+            "safe_candidates_found": self.safe_candidates_found,
             "unrecognised_medications": self.unrecognised_medications,
         }
 
@@ -217,6 +223,7 @@ class RecommendationService:
             recommended=recommended[: self.max_recommendations],
             excluded=excluded,
             candidates_considered=len(scored),
+            safe_candidates_found=len(recommended),
             unrecognised_medications=unrecognised,
         )
 

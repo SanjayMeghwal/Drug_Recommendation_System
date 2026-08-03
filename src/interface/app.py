@@ -119,7 +119,12 @@ with recommend_tab:
                 "with the selected medications. See the excluded list below."
             )
         else:
-            st.success(f"{len(result['recommended'])} option(s) ranked safest first.")
+            shown, found = len(result["recommended"]), result["safe_candidates_found"]
+            message = f"{shown} option(s) ranked safest first."
+            if found > shown:
+                # Say so, rather than letting the counts silently disagree.
+                message += f" Showing the top {shown} of {found} acceptable options."
+            st.success(message)
 
         for item in result["recommended"]:
             icon, risk_label = RISK_STYLES[item["risk_level"]]
