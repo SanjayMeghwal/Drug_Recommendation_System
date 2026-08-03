@@ -7,7 +7,7 @@ Geometric `Data` object.
 Not committed to git — regenerate with:
 
 ```
-python src/graph_construction/run.py
+python -m src.graph_construction.run
 ```
 
 ## Contents

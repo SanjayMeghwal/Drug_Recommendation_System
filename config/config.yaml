@@ -1,6 +1,5 @@
 # Central configuration for the project.
-# Filled in as each module is implemented — no hardcoded paths/parameters
-# should exist inside src/.
+# No paths or hyperparameters should be hardcoded inside src/.
 
 paths:
   raw_data_dir: data/raw
@@ -10,9 +9,26 @@ paths:
   results_dir: results
 
 model:
-  # GNN architecture and training hyperparameters go here once Module D
-  # (src/models) is implemented.
+  # Encoder: two graph convolution layers producing a drug embedding.
+  # conv_type "gcn" is the default (simplest choice that meets the
+  # requirement); "gat" swaps in attention without any other code change.
+  conv_type: gcn
+  hidden_channels: 64
+  embedding_dim: 32
+  dropout: 0.2
+  attention_heads: 4 # only used when conv_type is "gat"
+
+  # Decoder scoring a drug pair from its two embeddings.
+  # "dot" is parameter-free; "mlp" is the more expressive fallback.
+  decoder: dot
+
+training:
+  epochs: 200
+  learning_rate: 0.01
+  weight_decay: 0.0005
+  patience: 20 # early stopping: epochs without validation AUC improvement
+  seed: 42
 
 recommendation:
-  # Safety thresholds used by Module G (src/recommendation) to filter/penalize
-  # candidate drugs based on interaction risk go here.
+  # Safety thresholds used by Module G (src/recommendation) to filter or
+  # penalize candidate drugs. Populated on Day 8.

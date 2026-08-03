@@ -41,7 +41,7 @@ class; other values are specific interaction event types), `split`,
 ## Reproducing this step
 
 ```
-python src/ingestion/run.py
+python -m src.ingestion.run
 ```
 
 Downloads are skipped if the files already exist in `data/raw/` (idempotent).

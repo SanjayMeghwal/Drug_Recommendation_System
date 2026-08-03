@@ -56,6 +56,31 @@ Verify the install:
 python -c "import torch, torch_geometric, networkx, pandas, numpy, shap, fastapi, uvicorn, streamlit, pytest; print('All imports OK')"
 ```
 
+## Running the Pipeline
+
+Run each stage from the repository root, in order. Every stage is a module
+(`python -m ...`) so imports resolve regardless of the working directory.
+
+```
+python -m src.ingestion.run           # Module A: download the dataset into data/raw/
+python -m src.preprocessing.run       # Module B: clean into data/processed/
+python -m src.graph_construction.run  # Module C: build data/graph/ddi_graph.pt
+python -m src.models.train            # Module D: train, save artifacts/trained_models/
+```
+
+Stages are idempotent — ingestion skips files already downloaded, and the
+later stages simply overwrite their outputs.
+
+Then run the tests and launch the app:
+
+```
+pytest
+python -m uvicorn src.api.main:app --reload        # API on http://127.0.0.1:8000
+python -m streamlit run src/interface/app.py       # UI on http://localhost:8501
+```
+
+See `docs/data_acquisition.md` for the dataset source, license, and citation.
+
 ## Tech Stack
 
 Python, PyTorch, PyTorch Geometric, NetworkX, Pandas/NumPy, SHAP, FastAPI, Streamlit,
