@@ -239,6 +239,7 @@ def test_result_serialises_to_dict(service):
         "recommended",
         "excluded",
         "candidates_considered",
+        "safe_candidates_found",
         "unrecognised_medications",
     }
     if payload["recommended"]:
