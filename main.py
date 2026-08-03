@@ -14,7 +14,7 @@ from src.api.main import orchestrate_recommendation
 def main() -> None:
     result = orchestrate_recommendation(
         condition="hypertension",
-        current_medications=["Aspirin"],
+        current_medications=["Warfarin"],
     )
     print("Recommended:")
     for item in result["recommended"]:
