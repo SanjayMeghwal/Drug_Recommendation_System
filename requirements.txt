@@ -12,6 +12,10 @@ torch-geometric==2.8.0.post1
 # Graph utilities
 networkx==3.4.2
 
+# Cheminformatics — computes the interpretable molecular descriptors used as
+# node features (see src/graph_construction/run.py)
+rdkit==2026.3.4
+
 # Data processing
 pandas==2.3.3
 numpy==2.2.6
