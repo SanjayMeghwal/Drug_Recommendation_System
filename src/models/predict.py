@@ -109,6 +109,30 @@ class DDIPredictionService:
     def name_for(self, drug_id: str) -> str:
         return self.name_of_drug_id.get(drug_id, drug_id)
 
+    def search_drugs(self, query: str, limit: int = 10) -> list[dict]:
+        """Find drugs whose name contains `query`, case-insensitively.
+
+        Backs the interface's autocomplete, so a user picks a name the system
+        actually knows rather than discovering at submit time that it does
+        not. Prefix matches rank above mid-string ones, since someone typing
+        "warf" wants Warfarin ahead of a drug merely containing those letters.
+        """
+        needle = str(query).strip().lower()
+        if not needle:
+            return []
+
+        prefix_matches, other_matches = [], []
+        for name_lower, drug_id in self.drug_id_of_name.items():
+            if name_lower.startswith(needle):
+                prefix_matches.append(drug_id)
+            elif needle in name_lower:
+                other_matches.append(drug_id)
+
+        ranked = sorted(prefix_matches, key=self.name_for) + sorted(
+            other_matches, key=self.name_for
+        )
+        return [{"drug_id": drug_id, "name": self.name_for(drug_id)} for drug_id in ranked[:limit]]
+
     def predict(self, drug_a: str, drug_b: str) -> float:
         """Return the probability that two drugs interact, in [0, 1]."""
         return self.predict_batch([(drug_a, drug_b)])[0]
